@@ -25,26 +25,11 @@ public class Main {
                     System.out.println(helpStatement);
                     return;
                 }
-                case "-s" -> {
-                    if (option != 0) {
-                        multipleFlags = true;
-                    } else {
-                        option = 1;
-                    }
-                }
-                case "-p" -> {
+                case "-x" -> {
                     if (option != 0) {
                         multipleFlags = true;
                     }
-                    if (option < 2) {
-                        option = 2;
-                    }
-                }
-                case "-r" -> {
-                    if (option != 0) {
-                        multipleFlags = true;
-                    }
-                    option = 3;
+                    option = 2;
                 }
                 default -> {
                     if (fileName.isEmpty()) {
@@ -62,45 +47,22 @@ public class Main {
                     "        Try '-h' for information on command-line syntax.");
         }
 
-        if (option == 0){
-            option = 2;
-        }
-
         Scanner scanner = new Scanner(fileName);
         if (scanner.hasErrors()) {
             return;
         }
         Parser parser = new Parser(scanner);
 
-        switch (option) {
-            case 1:
-                runSFlag(scanner);
-                break;
-            case 2:
-                runPFlag(parser);
-                break;
-            case 3:
-                runRFlag(parser);
-                break;
-            default:
-                System.err.println("ERROR:  Unknown option.");
+        if (option == 2) {
+            runPFlag(parser);
+        } else {
+            System.err.println("ERROR:  Unknown option.");
         }
 
     }
 
-    public static void runSFlag(Scanner scanner) {
-            Trio currentWord;
-            do {
-                currentWord = scanner.getNextWord();
-                System.out.print(currentWord);
-            } while (!currentWord.isEOF());
-        }
 
     public static void runPFlag(Parser parser){
         parser.parseP();
-    }
-
-    public static void runRFlag(Parser parser){
-        parser.parseR();
     }
 }
