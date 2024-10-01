@@ -4,18 +4,17 @@ public class Main {
     public static void main(String[] args) {
         String helpStatement = """
                 Command Syntax:
-                        ./lab1_ref [flags] filename
+                        ./412alloc [flags] filename
 
                 Required arguments:
                         filename  is the pathname (absolute or relative) to the input file
 
                 Optional flags:
+                         k       specifies the number of registers available to the allocator
                         -h       prints this message
 
-                At most one of the following three flags:
-                        -s       prints tokens in token stream
-                        -p       invokes parser and reports on success or failure
-                        -r       prints human readable version of parser's IR
+                At most one of the following two flags:
+                        -x       only for code check 1, scans, parses and 
                 If none is specified, the default action is '-p'.""";
         String fileName = "";
         int option = 0;
