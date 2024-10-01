@@ -61,8 +61,13 @@ public class Main {
 
     }
 
-
     public static void runPFlag(Parser parser){
         parser.parseP();
+        Renamer renamer = new Renamer(parser.getTail());
+        if (parser.isValid()) {
+            renamer.rename();
+        } else {
+            System.err.println("Due to syntax errors, run terminates");
+        }
     }
 }

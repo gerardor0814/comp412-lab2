@@ -14,12 +14,11 @@
 
 public class Parser {
 
-    private Scanner scanner;
-    private IRNode head;
+    private final Scanner scanner;
+    private final IRNode head;
     private IRNode tail;
     private boolean valid;
     private int count;
-
 
 
     public Parser(Scanner scanner) {
@@ -78,10 +77,12 @@ public class Parser {
                                         this.valid = false;
                                         scanner.getNextLine();
                                     } else {
+                                        currentNode.setIndex(count);
                                         currentNode.setNext(new IRNode());
                                         currentNode.getNext().setPrev(currentNode);
                                         currentNode = currentNode.getNext();
                                         count++;
+                                        
                                     }
                                 } else {
                                     System.err.println("ERROR " + currentWord.Line() + ": Missing target register in load operation");
@@ -114,6 +115,7 @@ public class Parser {
                                         this.valid = false;
                                         scanner.getNextLine();
                                     } else {
+                                        currentNode.setIndex(count);
                                         currentNode.setNext(new IRNode());
                                         currentNode.getNext().setPrev(currentNode);
                                         currentNode = currentNode.getNext();
@@ -152,6 +154,7 @@ public class Parser {
                                     this.valid = false;
                                     scanner.getNextLine();
                                 } else {
+                                    currentNode.setIndex(count);
                                     currentNode.setNext(new IRNode());
                                     currentNode.getNext().setPrev(currentNode);
                                     currentNode = currentNode.getNext();
@@ -195,6 +198,7 @@ public class Parser {
                                                 this.valid = false;
                                                 scanner.getNextLine();
                                             } else {
+                                                currentNode.setIndex(count);
                                                 currentNode.setNext(new IRNode());
                                                 currentNode.getNext().setPrev(currentNode);
                                                 currentNode = currentNode.getNext();
@@ -246,6 +250,7 @@ public class Parser {
                                                 this.valid = false;
                                                 scanner.getNextLine();
                                             } else {
+                                                currentNode.setIndex(count);
                                                 currentNode.setNext(new IRNode());
                                                 currentNode.getNext().setPrev(currentNode);
                                                 currentNode = currentNode.getNext();
@@ -297,6 +302,7 @@ public class Parser {
                                                 this.valid = false;
                                                 scanner.getNextLine();
                                             } else {
+                                                currentNode.setIndex(count);
                                                 currentNode.setNext(new IRNode());
                                                 currentNode.getNext().setPrev(currentNode);
                                                 currentNode = currentNode.getNext();
@@ -348,6 +354,7 @@ public class Parser {
                                                 this.valid = false;
                                                 scanner.getNextLine();
                                             } else {
+                                                currentNode.setIndex(count);
                                                 currentNode.setNext(new IRNode());
                                                 currentNode.getNext().setPrev(currentNode);
                                                 currentNode = currentNode.getNext();
@@ -399,6 +406,7 @@ public class Parser {
                                                 this.valid = false;
                                                 scanner.getNextLine();
                                             } else {
+                                                currentNode.setIndex(count);
                                                 currentNode.setNext(new IRNode());
                                                 currentNode.getNext().setPrev(currentNode);
                                                 currentNode = currentNode.getNext();
@@ -443,6 +451,7 @@ public class Parser {
                             this.valid = false;
                             scanner.getNextLine();
                         } else {
+                            currentNode.setIndex(count);
                             currentNode.setNext(new IRNode());
                             currentNode.getNext().setPrev(currentNode);
                             currentNode = currentNode.getNext();
@@ -462,6 +471,7 @@ public class Parser {
                         this.valid = false;
                         scanner.getNextLine();
                     } else {
+                        currentNode.setIndex(count);
                         currentNode.setNext(new IRNode());
                         currentNode.getNext().setPrev(currentNode);
                         currentNode = currentNode.getNext();
@@ -485,5 +495,16 @@ public class Parser {
                 }
             }
         }
+    }
+
+    public IRNode getHead() {
+        return this.head;
+    }
+    public IRNode getTail() {
+        return this.tail;
+    }
+
+    public boolean isValid() {
+        return !scanner.hasErrors() && this.valid;
     }
 }

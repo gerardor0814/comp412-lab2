@@ -15,6 +15,7 @@
 public class IRNode {
     int[] operands;
     private int line;
+    private int index;
     private int opCategory;
     private int opCode;
     private IRNode next;
@@ -48,9 +49,28 @@ public class IRNode {
         this.line = line;
     }
 
+    public int getLine() {
+        return this.line;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+    public int getIndex() {
+        return this.index;
+    }
+
     public void setOpType(int opCategory, int opCode) {
         this.opCategory = opCategory;
         this.opCode = opCode;
+    }
+
+    public int getOpCategory() {
+        return this.opCategory;
+    }
+
+    public int getOpCode() {
+        return this.opCode;
     }
 
     @Override
@@ -97,6 +117,6 @@ public class IRNode {
                 body = "[ ], [ ], [ ]";
             }
         }
-        return operation + body;
+        return index + ": " + operation + body;
     }
 }
