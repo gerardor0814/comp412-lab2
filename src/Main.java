@@ -54,7 +54,7 @@ public class Main {
         Parser parser = new Parser(scanner);
 
         if (option == 2) {
-            runPFlag(parser);
+            runXFlag(parser);
         } else {
             System.err.println("ERROR:  Unknown option.");
         }
@@ -63,6 +63,10 @@ public class Main {
 
     public static void runPFlag(Parser parser){
         parser.parseP();
+    }
+
+    public static void runXFlag(Parser parser) {
+        parser.parseX();
         Renamer renamer = new Renamer(parser.getTail());
         IRNode currentNode = parser.getHead();
         if (parser.isValid()) {
@@ -74,6 +78,5 @@ public class Main {
         } else {
             System.err.println("Due to syntax errors, run terminates");
         }
-
     }
 }

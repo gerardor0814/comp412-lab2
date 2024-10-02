@@ -30,7 +30,6 @@ public class Parser {
 
     public void parseP() {
         this.parse();
-
         if (scanner.hasErrors() || !this.valid) {
             System.err.println("Parse found errors");
         } else {
@@ -38,6 +37,9 @@ public class Parser {
         }
     }
 
+    public void parseX() {
+        this.parse();
+    }
     public void parseR() {
         this.parse();
         IRNode currentNode = head;
