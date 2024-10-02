@@ -64,10 +64,16 @@ public class Main {
     public static void runPFlag(Parser parser){
         parser.parseP();
         Renamer renamer = new Renamer(parser.getTail());
+        IRNode currentNode = parser.getHead();
         if (parser.isValid()) {
             renamer.rename();
+            while (currentNode != null) {
+                System.out.println(currentNode.rewrittenString());
+                currentNode = currentNode.getNext();
+            }
         } else {
             System.err.println("Due to syntax errors, run terminates");
         }
+
     }
 }

@@ -1,12 +1,12 @@
 public class Renamer {
     private final IRNode tail;
 
-    public Renamer(IRNode tail){
+    public Renamer(IRNode tail) {
         this.tail = tail;
     }
 
-    public void rename(){
-        int VRName = 0;
+    public void rename() {
+        int VRName = -1;
 
         int[] SRToVR = new int[tail.getIndex()];
         int[] LastUsed = new int[tail.getIndex()];
@@ -18,46 +18,99 @@ public class Renamer {
 
         IRNode currentNode = tail;
         while (currentNode != null) {
-            case 0 -> {
-                if (currentNode.getOpCode() == 0) {
-                    operation = "load    ";
-                } else {
-                    operation = "store   ";
+            switch (currentNode.getOpCategory()) {
+                case 0 -> {
+                    // load
+                    if (currentNode.getOpCode() == 0) {
+                        // def
+                        if (SRToVR[currentNode.getSR(3)] == -1) {
+                            VRName++;
+                            SRToVR[currentNode.getSR(3)] = VRName;
+                        }
+                        currentNode.setOperands(SRToVR[currentNode.getSR(3)], 9);
+                        currentNode.setOperands(LastUsed[currentNode.getSR(3)], 11);
+                        SRToVR[currentNode.getSR(3)] = -1;
+                        LastUsed[currentNode.getSR(3)] = Integer.MAX_VALUE;
+
+                        // use
+                        if (SRToVR[currentNode.getSR(1)] == -1) {
+                            VRName++;
+                            SRToVR[currentNode.getSR(1)] = VRName;
+                        }
+                        currentNode.setOperands(SRToVR[currentNode.getSR(1)], 1);
+                        currentNode.setOperands(LastUsed[currentNode.getSR(1)], 3);
+
+                        LastUsed[currentNode.getSR(1)] = index;
+                    } else {
+                        // store
+
+                        //use
+                        if (SRToVR[currentNode.getSR(1)] == -1) {
+                            VRName++;
+                            SRToVR[currentNode.getSR(1)] = VRName;
+                        }
+                        currentNode.setOperands(SRToVR[currentNode.getSR(1)], 1);
+                        currentNode.setOperands(LastUsed[currentNode.getSR(1)], 3);
+
+                        //use
+                        if (SRToVR[currentNode.getSR(3)] == -1) {
+                            VRName++;
+                            SRToVR[currentNode.getSR(3)] = VRName;
+                        }
+                        currentNode.setOperands(SRToVR[currentNode.getSR(3)], 9);
+                        currentNode.setOperands(LastUsed[currentNode.getSR(3)], 11);
+
+                        LastUsed[currentNode.getSR(1)] = index;
+                        LastUsed[currentNode.getSR(3)] = index;
+                    }
                 }
-                body = "[ sr" + this.operands[0] + " ], [ ], [ sr" + this.operands[8] + " ]";
-            }
-            case 1 -> {
-                operation = "loadI   ";
-                body = "[ val " + this.operands[0] + " ], [ ], [ sr" + this.operands[8] + " ]";
-            }
-            case 2 -> {
-                if (currentNode.getOpCode() == 0) {
-                    operation = "add     ";
-                    body = "[ sr" + this.operands[0] + " ], [ sr" + this.operands[4] + " ], [ sr" + this.operands[8] + " ]";
-                } else if (currentNode.getOpCode() == 1) {
-                    operation = "sub     ";
-                    body = "[ sr" + this.operands[0] + " ], [ sr" + this.operands[4] + " ], [ sr" + this.operands[8] + " ]";
-                } else if (currentNode.getOpCode() == 2) {
-                    operation = "mult    ";
-                    body = "[ sr" + this.operands[0] + " ], [ sr" + this.operands[4] + " ], [ sr" + this.operands[8] + " ]";
-                } else if (currentNode.getOpCode() == 3) {
-                    operation = "lshift  ";
-                    body = "[ sr" + this.operands[0] + " ], [ sr" + this.operands[4] + " ], [ sr" + this.operands[8] + " ]";
-                } else if (currentNode.getOpCode() == 4) {
-                    operation = "rshift  ";
-                    body = "[ sr" + this.operands[0] + " ], [ sr" + this.operands[4] + " ], [ sr" + this.operands[8] + " ]";
+                case 1 -> {
+                    // loadI
+
+                    // def
+                    if (SRToVR[currentNode.getSR(3)] == -1) {
+                        VRName++;
+                        SRToVR[currentNode.getSR(3)] = VRName;
+                    }
+                    currentNode.setOperands(SRToVR[currentNode.getSR(3)], 9);
+                    currentNode.setOperands(LastUsed[currentNode.getSR(3)], 11);
+                    SRToVR[currentNode.getSR(3)] = -1;
+                    LastUsed[currentNode.getSR(3)] = Integer.MAX_VALUE;
                 }
-            }
-            case 3 -> {
-                operation = "output  ";
-                body = "[ val " + this.operands[0] + " ], [ ], [ ]";
-            }
-            case 4 -> {
-                operation = "nop     ";
-                body = "[ ], [ ], [ ]";
+                case 2 -> {
+                    // arith
+                    // def
+                    if (SRToVR[currentNode.getSR(3)] == -1) {
+                        VRName++;
+                        SRToVR[currentNode.getSR(3)] = VRName;
+                    }
+                    currentNode.setOperands(SRToVR[currentNode.getSR(3)], 9);
+                    currentNode.setOperands(LastUsed[currentNode.getSR(3)], 11);
+                    SRToVR[currentNode.getSR(3)] = -1;
+                    LastUsed[currentNode.getSR(3)] = Integer.MAX_VALUE;
+
+                    // use
+                    if (SRToVR[currentNode.getSR(1)] == -1) {
+                        VRName++;
+                        SRToVR[currentNode.getSR(1)] = VRName;
+                    }
+                    currentNode.setOperands(SRToVR[currentNode.getSR(1)], 1);
+                    currentNode.setOperands(LastUsed[currentNode.getSR(1)], 3);
+
+                    // use
+                    if (SRToVR[currentNode.getSR(2)] == -1) {
+                        VRName++;
+                        SRToVR[currentNode.getSR(2)] = VRName;
+                    }
+                    currentNode.setOperands(SRToVR[currentNode.getSR(2)], 5);
+                    currentNode.setOperands(LastUsed[currentNode.getSR(2)], 7);
+
+                    LastUsed[currentNode.getSR(1)] = index;
+                    LastUsed[currentNode.getSR(2)] = index;
+                }
             }
             currentNode = currentNode.getPrev();
-
+            index--;
         }
     }
 }

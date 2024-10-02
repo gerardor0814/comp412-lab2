@@ -73,6 +73,52 @@ public class IRNode {
         return this.opCode;
     }
 
+    public int getSR(int argument) {
+        return operands[(argument - 1) * 4];
+    }
+
+    public String rewrittenString() {
+        String operation = "";
+        String body = "";
+        switch (this.opCategory) {
+            case 0 -> {
+                if (this.opCode == 0) {
+                    operation = "load    ";
+                } else {
+                    operation = "store   ";
+                }
+                body = "r" + this.operands[1] + " => r" + this.operands[9];
+            }
+            case 1 -> {
+                operation = "loadI   ";
+                body = this.operands[0] + " => r" + this.operands[9];
+            }
+            case 2 -> {
+                if (this.opCode == 0) {
+                    operation = "add     ";
+                } else if (this.opCode == 1) {
+                    operation = "sub     ";
+                } else if (this.opCode == 2) {
+                    operation = "mult    ";
+                } else if (this.opCode == 3) {
+                    operation = "lshift  ";
+                } else if (this.opCode == 4) {
+                    operation = "rshift  ";
+                }
+                body = "r" + this.operands[1] + ", r" + this.operands[5] + " => r" + this.operands[9];
+
+            }
+            case 3 -> {
+                operation = "output  ";
+                body = "[ val " + this.operands[0] + " ], [ ], [ ]";
+            }
+            case 4 -> {
+                operation = "nop     ";
+                body = "[ ], [ ], [ ]";
+            }
+        }
+        return operation + body;    }
+
     @Override
     public String toString() {
         String operation = "";
@@ -93,20 +139,17 @@ public class IRNode {
             case 2 -> {
                 if (this.opCode == 0) {
                     operation = "add     ";
-                    body = "[ sr" + this.operands[0] + " ], [ sr" + this.operands[4] + " ], [ sr" + this.operands[8] + " ]";
                 } else if (this.opCode == 1) {
                     operation = "sub     ";
-                    body = "[ sr" + this.operands[0] + " ], [ sr" + this.operands[4] + " ], [ sr" + this.operands[8] + " ]";
                 } else if (this.opCode == 2) {
                     operation = "mult    ";
-                    body = "[ sr" + this.operands[0] + " ], [ sr" + this.operands[4] + " ], [ sr" + this.operands[8] + " ]";
                 } else if (this.opCode == 3) {
                     operation = "lshift  ";
-                    body = "[ sr" + this.operands[0] + " ], [ sr" + this.operands[4] + " ], [ sr" + this.operands[8] + " ]";
                 } else if (this.opCode == 4) {
                     operation = "rshift  ";
-                    body = "[ sr" + this.operands[0] + " ], [ sr" + this.operands[4] + " ], [ sr" + this.operands[8] + " ]";
                 }
+                body = "[ sr" + this.operands[0] + " ], [ sr" + this.operands[4] + " ], [ sr" + this.operands[8] + " ]";
+
             }
             case 3 -> {
                 operation = "output  ";
