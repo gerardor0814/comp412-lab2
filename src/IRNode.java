@@ -110,11 +110,11 @@ public class IRNode {
             }
             case 3 -> {
                 operation = "output  ";
-                body = "[ val " + this.operands[0] + " ], [ ], [ ]";
+                body = String.valueOf(this.operands[0]);
             }
             case 4 -> {
-                operation = "nop     ";
-                body = "[ ], [ ], [ ]";
+                operation = "nop";
+                body = "";
             }
         }
         return operation + body;    }
