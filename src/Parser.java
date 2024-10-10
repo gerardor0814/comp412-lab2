@@ -28,30 +28,15 @@ public class Parser {
         count = 0;
     }
 
-    public void parseP() {
-        this.parse();
-        if (scanner.hasErrors() || !this.valid) {
-            System.err.println("Parse found errors");
-        } else {
-            System.out.println("Parse succeeded. Processed " + count + " operations");
-        }
+    public IRNode getHead() {
+        return this.head;
+    }
+    public IRNode getTail() {
+        return this.tail;
     }
 
-    public void parseX() {
-        this.parse();
-    }
-    public void parseR() {
-        this.parse();
-        IRNode currentNode = head;
-        if (!scanner.hasErrors() && this.valid){
-            while (currentNode != null) {
-                System.out.println(currentNode);
-                currentNode = currentNode.getNext();
-            }
-        } else {
-            System.err.println("Due to syntax errors, run terminates");
-        }
-
+    public boolean isValid() {
+        return !scanner.hasErrors() && this.valid;
     }
 
     public void parse() {
@@ -497,16 +482,10 @@ public class Parser {
                 }
             }
         }
-    }
-
-    public IRNode getHead() {
-        return this.head;
-    }
-    public IRNode getTail() {
-        return this.tail;
-    }
-
-    public boolean isValid() {
-        return !scanner.hasErrors() && this.valid;
+        if (scanner.hasErrors() || !this.valid) {
+            System.err.println("Parse found errors");
+        } else {
+            System.out.println("Parse succeeded. Processed " + count + " operations");
+        }
     }
 }
