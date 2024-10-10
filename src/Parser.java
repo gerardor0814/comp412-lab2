@@ -484,8 +484,6 @@ public class Parser {
         }
         if (scanner.hasErrors() || !this.valid) {
             System.err.println("Parse found errors");
-        } else {
-            System.out.println("Parse succeeded. Processed " + count + " operations");
         }
     }
 }

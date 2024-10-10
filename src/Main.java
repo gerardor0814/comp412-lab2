@@ -36,13 +36,14 @@ public class Main {
                                 return;
                             }
                         }
-                        if (numRegisters < 3) {
-                            System.out.println("ERROR:  (Fatal) minimum value for k is 3.");
-                            System.out.println("Allocation failed.");
-                        }
                     }
                 }
             }
+        }
+        if (numRegisters < 3 && option == 0) {
+            System.out.println("ERROR:  (Fatal) minimum value for k is 3.");
+            System.out.println("Allocation failed.");
+            return;
         }
         Scanner scanner = new Scanner(fileName);
         if (scanner.hasErrors()) {
