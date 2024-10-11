@@ -132,6 +132,8 @@ public class Allocator {
             PRStack.push(i);
         }
 
+        Arrays.fill(VRToPR, -1);
+
         IRNode currentNode = this.head;
         while (currentNode != null) {
             switch (currentNode.getOpCategory()) {
@@ -139,12 +141,24 @@ public class Allocator {
                     // load
                     if (currentNode.getOpCode() == 0) {
                         // use
+                        if (VRToPR[currentNode.getVR(1)] != -1) {
+                            currentNode.setOperands(VRToPR[currentNode.getVR(1)], 2);
+                        }
 
-
+                        if (currentNode.getNU(1) == Integer.MAX_VALUE) {
+                            PRToVR[VRToPR[currentNode.getVR(1)]] = -1;
+                            PRStack.push(VRToPR[currentNode.getVR(1)]);
+                            VRToPR[currentNode.getVR(1)] = -1;
+                        }
 
                         // def
+                        if (!PRStack.empty()) {
+                            currPR = PRStack.pop();
+                        }
 
-
+                        PRToVR[currPR] = currentNode.getVR(3);
+                        VRToPR[currentNode.getVR(3)] = currPR;
+                        currentNode.setOperands(currPR, 10);
                     } else {
                         // store
 
@@ -164,7 +178,6 @@ public class Allocator {
 
                     PRToVR[currPR] = currentNode.getVR(3);
                     VRToPR[currentNode.getVR(3)] = currPR;
-
                     currentNode.setOperands(currPR, 10);
                 }
                 case 2 -> {

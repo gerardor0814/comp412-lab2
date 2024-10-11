@@ -81,6 +81,10 @@ public class IRNode {
         return operands[((argument - 1) * 4) + 1];
     }
 
+    public int getNU(int argument) {
+        return operands[((argument - 1) * 4) + 2];
+    }
+
     public String rewrittenString() {
         String operation = "";
         String body = "";
