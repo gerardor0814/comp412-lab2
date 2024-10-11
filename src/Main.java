@@ -65,10 +65,10 @@ public class Main {
 
     public static void runXFlag(Parser parser) {
         parser.parse();
-        Renamer renamer = new Renamer(parser.getTail());
+        Allocator allocator = new Allocator(parser.getTail(), parser.getHead());
         IRNode currentNode = parser.getHead();
         if (parser.isValid()) {
-            renamer.rename();
+            allocator.rename();
             while (currentNode != null) {
                 System.out.println(currentNode.rewrittenString());
                 currentNode = currentNode.getNext();

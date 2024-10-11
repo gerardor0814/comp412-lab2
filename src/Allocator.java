@@ -1,12 +1,19 @@
-public class Renamer {
-    private final IRNode tail;
+import java.util.Arrays;
+import java.util.Stack;
 
-    public Renamer(IRNode tail) {
+public class Allocator {
+    private final IRNode tail;
+    private final IRNode head;
+    private int VRName;
+
+    public Allocator(IRNode tail, IRNode head) {
         this.tail = tail;
+        this.head = head;
+        this.VRName = -1;
+
     }
 
     public void rename() {
-        int VRName = -1;
 
         int[] SRToVR = new int[tail.getIndex()];
         int[] LastUsed = new int[tail.getIndex()];
@@ -112,5 +119,66 @@ public class Renamer {
             currentNode = currentNode.getPrev();
             index--;
         }
+    }
+
+    public void allocate(int numRegisters) {
+        int[] VRToPR = new int[this.VRName + 1];
+        int[] PRToVR = new int[numRegisters];
+        Stack<Integer> PRStack = new Stack<>();
+        int currPR = -1;
+
+        for(int i = numRegisters - 1; i > 0; i--) {
+            PRToVR[i] = -1;
+            PRStack.push(i);
+        }
+
+        IRNode currentNode = this.head;
+        while (currentNode != null) {
+            switch (currentNode.getOpCategory()) {
+                case 0 -> {
+                    // load
+                    if (currentNode.getOpCode() == 0) {
+                        // use
+
+
+
+                        // def
+
+
+                    } else {
+                        // store
+
+                        //use
+
+                        //use
+
+                    }
+                }
+                case 1 -> {
+                    // loadI
+
+                    // def
+                    if (!PRStack.empty()) {
+                        currPR = PRStack.pop();
+                    }
+
+                    PRToVR[currPR] = currentNode.getVR(3);
+                    VRToPR[currentNode.getVR(3)] = currPR;
+
+                    currentNode.setOperands(currPR, 10);
+                }
+                case 2 -> {
+                    // arith
+                    // def
+
+                    // use
+
+                    // use
+
+                }
+            }
+            currentNode = currentNode.getNext();
+        }
+
     }
 }

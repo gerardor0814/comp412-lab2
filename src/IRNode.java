@@ -77,6 +77,10 @@ public class IRNode {
         return operands[(argument - 1) * 4];
     }
 
+    public int getVR(int argument) {
+        return operands[((argument - 1) * 4) + 1];
+    }
+
     public String rewrittenString() {
         String operation = "";
         String body = "";
