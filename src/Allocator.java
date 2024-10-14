@@ -167,17 +167,18 @@ public class Allocator {
                             currentNode.setOperands(VRToPR[currentNode.getVR(1)], 2);
                         }
 
-                        if (currentNode.getNU(1) == Integer.MAX_VALUE) {
-                            PRToVR[VRToPR[currentNode.getVR(1)]] = -1;
-                            PRStack.push(VRToPR[currentNode.getVR(1)]);
-                            VRToPR[currentNode.getVR(1)] = -1;
-                        }
                         //use
                         if (VRToPR[currentNode.getVR(3)] != -1) {
                             currentNode.setOperands(VRToPR[currentNode.getVR(3)], 10);
                         }
 
                         if (currentNode.getNU(1) == Integer.MAX_VALUE) {
+                            PRToVR[VRToPR[currentNode.getVR(1)]] = -1;
+                            PRStack.push(VRToPR[currentNode.getVR(1)]);
+                            VRToPR[currentNode.getVR(1)] = -1;
+                        }
+
+                        if (currentNode.getNU(3) == Integer.MAX_VALUE) {
                             PRToVR[VRToPR[currentNode.getVR(3)]] = -1;
                             PRStack.push(VRToPR[currentNode.getVR(3)]);
                             VRToPR[currentNode.getVR(3)] = -1;
@@ -205,15 +206,15 @@ public class Allocator {
                         currentNode.setOperands(VRToPR[currentNode.getVR(2)], 6);
                     }
 
+                    // use
+                    if (VRToPR[currentNode.getVR(1)] != -1) {
+                        currentNode.setOperands(VRToPR[currentNode.getVR(1)], 2);
+                    }
+
                     if (currentNode.getNU(2) == Integer.MAX_VALUE) {
                         PRToVR[VRToPR[currentNode.getVR(2)]] = -1;
                         PRStack.push(VRToPR[currentNode.getVR(2)]);
                         VRToPR[currentNode.getVR(2)] = -1;
-                    }
-
-                    // use
-                    if (VRToPR[currentNode.getVR(1)] != -1) {
-                        currentNode.setOperands(VRToPR[currentNode.getVR(1)], 2);
                     }
 
                     if (currentNode.getNU(1) == Integer.MAX_VALUE) {

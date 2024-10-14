@@ -65,7 +65,7 @@ public class Main {
         IRNode currentNode = parser.getHead();
         if (parser.isValid()) {
             allocator.rename();
-            allocator.allocate(4);
+            allocator.allocate(numRegisters);
             while (currentNode != null) {
                 System.out.println(currentNode.reallocatedString());
                 currentNode = currentNode.getNext();
