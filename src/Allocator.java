@@ -202,25 +202,25 @@ public class Allocator {
                     // arith
 
                     // use
-                    if (VRToPR[currentNode.getVR(2)] != -1) {
+                    if (VRToPR[currentNode.getVR(1)] != -1) {
                         currentNode.setOperands(VRToPR[currentNode.getVR(2)], 6);
                     }
 
                     // use
-                    if (VRToPR[currentNode.getVR(1)] != -1) {
+                    if (VRToPR[currentNode.getVR(2)] != -1) {
                         currentNode.setOperands(VRToPR[currentNode.getVR(1)], 2);
-                    }
-
-                    if (currentNode.getNU(2) == Integer.MAX_VALUE) {
-                        PRToVR[VRToPR[currentNode.getVR(2)]] = -1;
-                        PRStack.push(VRToPR[currentNode.getVR(2)]);
-                        VRToPR[currentNode.getVR(2)] = -1;
                     }
 
                     if (currentNode.getNU(1) == Integer.MAX_VALUE) {
                         PRToVR[VRToPR[currentNode.getVR(1)]] = -1;
                         PRStack.push(VRToPR[currentNode.getVR(1)]);
                         VRToPR[currentNode.getVR(1)] = -1;
+                    }
+
+                    if (currentNode.getNU(2) == Integer.MAX_VALUE) {
+                        PRToVR[VRToPR[currentNode.getVR(2)]] = -1;
+                        PRStack.push(VRToPR[currentNode.getVR(2)]);
+                        VRToPR[currentNode.getVR(2)] = -1;
                     }
 
                     // def

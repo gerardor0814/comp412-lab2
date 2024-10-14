@@ -23,9 +23,13 @@ public class Main {
                 case "-x" ->
                     option = 1;
                 default -> {
-                    if (numRegisters == -1) {
                         try {
-                            numRegisters = Integer.parseInt(arg);
+                            int n = Integer.parseInt(arg);
+                            if (numRegisters == -1) {
+                                numRegisters = n;
+                            } else {
+                                System.out.println("ERROR: Only input one value for k");
+                            }
                             // is an integer!
                         } catch (NumberFormatException e) {
                             if (fileName.isEmpty()) {
@@ -35,7 +39,6 @@ public class Main {
                                 System.out.println(helpStatement);
                                 return;
                             }
-                        }
                     }
                 }
             }
