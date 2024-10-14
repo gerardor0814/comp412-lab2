@@ -127,7 +127,7 @@ public class Allocator {
         Stack<Integer> PRStack = new Stack<>();
         int currPR = -1;
 
-        for(int i = numRegisters - 1; i > 0; i--) {
+        for(int i = numRegisters - 1; i >= 0; i--) {
             PRToVR[i] = -1;
             PRStack.push(i);
         }
@@ -163,8 +163,25 @@ public class Allocator {
                         // store
 
                         //use
+                        if (VRToPR[currentNode.getVR(1)] != -1) {
+                            currentNode.setOperands(VRToPR[currentNode.getVR(1)], 2);
+                        }
 
+                        if (currentNode.getNU(1) == Integer.MAX_VALUE) {
+                            PRToVR[VRToPR[currentNode.getVR(1)]] = -1;
+                            PRStack.push(VRToPR[currentNode.getVR(1)]);
+                            VRToPR[currentNode.getVR(1)] = -1;
+                        }
                         //use
+                        if (VRToPR[currentNode.getVR(3)] != -1) {
+                            currentNode.setOperands(VRToPR[currentNode.getVR(3)], 10);
+                        }
+
+                        if (currentNode.getNU(1) == Integer.MAX_VALUE) {
+                            PRToVR[VRToPR[currentNode.getVR(3)]] = -1;
+                            PRStack.push(VRToPR[currentNode.getVR(3)]);
+                            VRToPR[currentNode.getVR(3)] = -1;
+                        }
 
                     }
                 }
@@ -182,11 +199,38 @@ public class Allocator {
                 }
                 case 2 -> {
                     // arith
+
+                    // use
+                    if (VRToPR[currentNode.getVR(2)] != -1) {
+                        currentNode.setOperands(VRToPR[currentNode.getVR(2)], 6);
+                    }
+
+                    if (currentNode.getNU(2) == Integer.MAX_VALUE) {
+                        PRToVR[VRToPR[currentNode.getVR(2)]] = -1;
+                        PRStack.push(VRToPR[currentNode.getVR(2)]);
+                        VRToPR[currentNode.getVR(2)] = -1;
+                    }
+
+                    // use
+                    if (VRToPR[currentNode.getVR(1)] != -1) {
+                        currentNode.setOperands(VRToPR[currentNode.getVR(1)], 2);
+                    }
+
+                    if (currentNode.getNU(1) == Integer.MAX_VALUE) {
+                        PRToVR[VRToPR[currentNode.getVR(1)]] = -1;
+                        PRStack.push(VRToPR[currentNode.getVR(1)]);
+                        VRToPR[currentNode.getVR(1)] = -1;
+                    }
+
                     // def
 
-                    // use
+                    if (!PRStack.empty()) {
+                        currPR = PRStack.pop();
+                    }
 
-                    // use
+                    PRToVR[currPR] = currentNode.getVR(3);
+                    VRToPR[currentNode.getVR(3)] = currPR;
+                    currentNode.setOperands(currPR, 10);
 
                 }
             }

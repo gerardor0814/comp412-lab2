@@ -82,7 +82,7 @@ public class IRNode {
     }
 
     public int getNU(int argument) {
-        return operands[((argument - 1) * 4) + 2];
+        return operands[((argument - 1) * 4) + 3];
     }
 
     public String rewrittenString() {
@@ -125,7 +125,51 @@ public class IRNode {
                 body = "";
             }
         }
-        return operation + body;    }
+        return operation + body;
+    }
+
+    public String reallocatedString() {
+        String operation = "";
+        String body = "";
+        switch (this.opCategory) {
+            case 0 -> {
+                if (this.opCode == 0) {
+                    operation = "load    ";
+                } else {
+                    operation = "store   ";
+                }
+                body = "r" + this.operands[2] + " => r" + this.operands[10];
+            }
+            case 1 -> {
+                operation = "loadI   ";
+                body = this.operands[0] + " => r" + this.operands[10];
+            }
+            case 2 -> {
+                if (this.opCode == 0) {
+                    operation = "add     ";
+                } else if (this.opCode == 1) {
+                    operation = "sub     ";
+                } else if (this.opCode == 2) {
+                    operation = "mult    ";
+                } else if (this.opCode == 3) {
+                    operation = "lshift  ";
+                } else if (this.opCode == 4) {
+                    operation = "rshift  ";
+                }
+                body = "r" + this.operands[2] + ", r" + this.operands[6] + " => r" + this.operands[10];
+
+            }
+            case 3 -> {
+                operation = "output  ";
+                body = String.valueOf(this.operands[0]);
+            }
+            case 4 -> {
+                operation = "nop";
+                body = "";
+            }
+        }
+        return operation + body;
+    }
 
     @Override
     public String toString() {

@@ -61,6 +61,18 @@ public class Main {
 
     public static void run(Parser parser, int numRegisters) {
         parser.parse();
+        Allocator allocator = new Allocator(parser.getTail(), parser.getHead());
+        IRNode currentNode = parser.getHead();
+        if (parser.isValid()) {
+            allocator.rename();
+            allocator.allocate(4);
+            while (currentNode != null) {
+                System.out.println(currentNode.reallocatedString());
+                currentNode = currentNode.getNext();
+            }
+        } else {
+            System.err.println("Due to syntax errors, run terminates");
+        }
     }
 
     public static void runXFlag(Parser parser) {
