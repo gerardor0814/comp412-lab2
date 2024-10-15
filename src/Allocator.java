@@ -146,7 +146,7 @@ public class Allocator {
         int currLastPRNU;
         Stack<Integer> PRStack = new Stack<>();
 
-        if (numRegisters == MAXLIVE) {
+        if (numRegisters < MAXLIVE) {
             PRToVR = new int[numRegisters - 1];
             PRNU = new int[numRegisters - 1];
             for(int i = numRegisters - 2; i >= 0; i--) {
