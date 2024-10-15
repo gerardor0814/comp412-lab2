@@ -43,6 +43,12 @@ public class Main {
                 }
             }
         }
+
+        if (numRegisters == -1) {
+            System.out.println("Warning: k not set; assuming 32");
+            numRegisters = 32;
+        }
+
         if (numRegisters < 3 && option == 0) {
             System.out.println("ERROR:  (Fatal) minimum value for k is 3.");
             System.out.println("Allocation failed.");
