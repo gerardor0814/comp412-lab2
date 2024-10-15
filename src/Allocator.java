@@ -134,7 +134,6 @@ public class Allocator {
                 MAXLIVE = currLive;
             }
         }
-        System.out.println("MAXLIVE: " + MAXLIVE);
     }
 
     public void allocate(int numRegisters) {
