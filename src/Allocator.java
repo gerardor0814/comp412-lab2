@@ -142,7 +142,7 @@ public class Allocator {
         int[] PRToVR;
         int[] PRNU;
         int currPR = -1;
-        int currSpillLoc = 32768;
+        int currSpillLoc =  65536;
         int currLastPRNU;
         Stack<Integer> PRStack = new Stack<>();
 
