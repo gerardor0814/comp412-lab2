@@ -203,6 +203,11 @@ public class Allocator {
                                 currentNode.setPrev(tempStore);
                                 currSpillLoc += 4;
                                 currPR = currLastPRNU;
+
+                                PRToVR[currPR] = currentNode.getVR(1);
+                                VRToPR[currentNode.getVR(1)] = currPR;
+                                PRNU[currPR] = currentNode.getNU(1);
+                                currentNode.setOperands(currPR, 2);
                             }
                             IRNode tempLoadI = new IRNode();
                             IRNode tempLoad = new IRNode();
@@ -216,9 +221,6 @@ public class Allocator {
                             tempLoad.setOperands(numRegisters - 1, 2);
                             tempLoad.setOperands(currentNode.getVR(1), 9);
 
-                            PRToVR[currPR] = currentNode.getVR(3);
-                            VRToPR[currentNode.getVR(3)] = currPR;
-                            currentNode.setOperands(currPR, 10);
                             tempLoad.setOperands(currPR, 10);
                             tempLoad.setOperands(currentNode.getIndex(), 11);
 
@@ -229,10 +231,6 @@ public class Allocator {
                             tempLoad.setNext(currentNode);
                             currentNode.setPrev(tempLoad);
                         }
-                        PRToVR[currPR] = currentNode.getVR(1);
-                        VRToPR[currentNode.getVR(1)] = currPR;
-                        PRNU[currPR] = currentNode.getNU(1);
-                        currentNode.setOperands(currPR, 2);
 
                         if (currentNode.getNU(1) == Integer.MAX_VALUE && !(PRToVR[currentNode.getPR(1)] == -1)) {
                             VRToPR[PRToVR[currentNode.getPR(1)]] = -1;
@@ -270,12 +268,13 @@ public class Allocator {
                             currentNode.setPrev(tempStore);
                             currSpillLoc += 4;
                             currPR = currLastPRNU;
-                        }
 
+                        }
                         PRToVR[currPR] = currentNode.getVR(3);
                         VRToPR[currentNode.getVR(3)] = currPR;
-                        PRNU[VRToPR[currentNode.getVR(3)]] = currentNode.getNU(3);
+                        PRNU[currPR] = currentNode.getNU(3);
                         currentNode.setOperands(currPR, 10);
+
                     } else {
                         // store
 
@@ -311,6 +310,11 @@ public class Allocator {
                                 currentNode.setPrev(tempStore);
                                 currSpillLoc += 4;
                                 currPR = currLastPRNU;
+
+                                PRToVR[currPR] = currentNode.getVR(1);
+                                VRToPR[currentNode.getVR(1)] = currPR;
+                                PRNU[currPR] = currentNode.getNU(1);
+                                currentNode.setOperands(currPR, 10);
                             }
                             IRNode tempLoadI = new IRNode();
                             tempLoadI.setOpType(1, 0);
@@ -335,6 +339,11 @@ public class Allocator {
                             tempLoad.setPrev(tempLoadI);
                             tempLoad.setNext(currentNode);
                             currentNode.setPrev(tempLoad);
+
+                            PRToVR[currPR] = currentNode.getVR(1);
+                            VRToPR[currentNode.getVR(1)] = currPR;
+                            PRNU[currPR] = currentNode.getNU(1);
+                            currentNode.setOperands(currPR, 2);
                         }
 
                         // use
@@ -393,6 +402,11 @@ public class Allocator {
                             tempLoad.setPrev(tempLoadI);
                             tempLoad.setNext(currentNode);
                             currentNode.setPrev(tempLoad);
+
+                            PRToVR[currPR] = currentNode.getVR(3);
+                            VRToPR[currentNode.getVR(3)] = currPR;
+                            PRNU[currPR] = currentNode.getNU(3);
+                            currentNode.setOperands(currPR, 10);
                         }
 
                         if (currentNode.getNU(1) == Integer.MAX_VALUE && !(PRToVR[currentNode.getPR(1)] == -1)) {
@@ -485,6 +499,11 @@ public class Allocator {
                             currentNode.setPrev(tempStore);
                             currSpillLoc += 4;
                             currPR = currLastPRNU;
+
+                            PRToVR[currPR] = currentNode.getVR(1);
+                            VRToPR[currentNode.getVR(1)] = currPR;
+                            PRNU[currPR] = currentNode.getNU(1);
+                            currentNode.setOperands(currPR, 2);
                         }
                         IRNode tempLoadI = new IRNode();
                         tempLoadI.setOpType(1, 0);
@@ -497,9 +516,6 @@ public class Allocator {
                         tempLoad.setOperands(numRegisters - 1, 2);
                         tempLoad.setOperands(currentNode.getVR(1), 9);
 
-                        PRToVR[currPR] = currentNode.getVR(3);
-                        VRToPR[currentNode.getVR(3)] = currPR;
-                        currentNode.setOperands(currPR, 10);
                         tempLoad.setOperands(currPR, 10);
                         tempLoad.setOperands(currentNode.getIndex(), 11);
 
@@ -543,6 +559,11 @@ public class Allocator {
                             currentNode.setPrev(tempStore);
                             currSpillLoc += 4;
                             currPR = currLastPRNU;
+
+                            PRToVR[currPR] = currentNode.getVR(2);
+                            VRToPR[currentNode.getVR(2)] = currPR;
+                            PRNU[currPR] = currentNode.getNU(2);
+                            currentNode.setOperands(currPR, 6);
                         }
                         IRNode tempLoadI = new IRNode();
                         tempLoadI.setOpType(1, 0);
