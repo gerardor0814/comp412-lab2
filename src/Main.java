@@ -44,7 +44,7 @@ public class Main {
             }
         }
 
-        if (numRegisters == -1) {
+        if (numRegisters == -1 && option == 0) {
             System.out.println("Warning: k not set; assuming 32");
             numRegisters = 32;
         }
