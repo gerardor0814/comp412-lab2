@@ -19,7 +19,7 @@ public class Parser {
     private IRNode tail;
     private boolean valid;
     private int count;
-
+    private int maxSR;
 
     public Parser(Scanner scanner) {
         this.scanner = scanner;
@@ -39,6 +39,10 @@ public class Parser {
         return !scanner.hasErrors() && this.valid;
     }
 
+    public int getMaxSR() {
+        return this.maxSR;
+    }
+
     public void parse() {
         Trio currentWord;
         IRNode currentNode = head;
@@ -53,11 +57,17 @@ public class Parser {
                         currentWord = scanner.getNextWord();
                         if (currentWord.Category() == 6) {
                             currentNode.setOperands(currentWord.Words(), 0);
+                            if (currentWord.Words() > maxSR) {
+                                maxSR = currentWord.Words();
+                            }
                             currentWord = scanner.getNextWord();
                             if (currentWord.Category() == 8) {
                                 currentWord = scanner.getNextWord();
                                 if (currentWord.Category() == 6) {
                                     currentNode.setOperands(currentWord.Words(), 8);
+                                    if (currentWord.Words() > maxSR) {
+                                        maxSR = currentWord.Words();
+                                    }
                                     currentWord = scanner.getNextWord();
                                     if (currentWord.Category() != 10) {
                                         System.err.println("ERROR " + currentWord.Line() + ": Extraneous argument in load operation");
@@ -91,11 +101,17 @@ public class Parser {
                         currentNode.setOpType(0, 1);
                         if (currentWord.Category() == 6) {
                             currentNode.setOperands(currentWord.Words(), 0);
+                            if (currentWord.Words() > maxSR) {
+                                maxSR = currentWord.Words();
+                            }
                             currentWord = scanner.getNextWord();
                             if (currentWord.Category() == 8) {
                                 currentWord = scanner.getNextWord();
                                 if (currentWord.Category() == 6) {
                                     currentNode.setOperands(currentWord.Words(), 8);
+                                    if (currentWord.Words() > maxSR) {
+                                        maxSR = currentWord.Words();
+                                    }
                                     currentWord = scanner.getNextWord();
                                     if (currentWord.Category() != 10) {
                                         System.err.println("ERROR " + currentWord.Line() + ": Extraneous argument in store operation");
@@ -135,6 +151,9 @@ public class Parser {
                             currentWord = scanner.getNextWord();
                             if (currentWord.Category() == 6) {
                                 currentNode.setOperands(currentWord.Words(), 8);
+                                if (currentWord.Words() > maxSR) {
+                                    maxSR = currentWord.Words();
+                                }
                                 currentWord = scanner.getNextWord();
                                 if (currentWord.Category() != 10) {
                                     System.err.println("ERROR " + currentWord.Line() + ": Extraneous argument in loadI operation");
@@ -169,16 +188,25 @@ public class Parser {
                         currentWord = scanner.getNextWord();
                         if (currentWord.Category() == 6) {
                             currentNode.setOperands(currentWord.Words(), 0);
+                            if (currentWord.Words() > maxSR) {
+                                maxSR = currentWord.Words();
+                            }
                             currentWord = scanner.getNextWord();
                             if (currentWord.Category() == 7) {
                                 currentWord = scanner.getNextWord();
                                 if (currentWord.Category() == 6) {
                                     currentNode.setOperands(currentWord.Words(), 4);
+                                    if (currentWord.Words() > maxSR) {
+                                        maxSR = currentWord.Words();
+                                    }
                                     currentWord = scanner.getNextWord();
                                     if (currentWord.Category() == 8) {
                                         currentWord = scanner.getNextWord();
                                         if (currentWord.Category() == 6) {
                                             currentNode.setOperands(currentWord.Words(), 8);
+                                            if (currentWord.Words() > maxSR) {
+                                                maxSR = currentWord.Words();
+                                            }
                                             currentWord = scanner.getNextWord();
                                             if (currentWord.Category() != 10) {
                                                 System.err.println("ERROR " + currentWord.Line() + ": Extraneous argument in add operation");
@@ -221,16 +249,25 @@ public class Parser {
                         currentWord = scanner.getNextWord();
                         if (currentWord.Category() == 6) {
                             currentNode.setOperands(currentWord.Words(), 0);
+                            if (currentWord.Words() > maxSR) {
+                                maxSR = currentWord.Words();
+                            }
                             currentWord = scanner.getNextWord();
                             if (currentWord.Category() == 7) {
                                 currentWord = scanner.getNextWord();
                                 if (currentWord.Category() == 6) {
                                     currentNode.setOperands(currentWord.Words(), 4);
+                                    if (currentWord.Words() > maxSR) {
+                                        maxSR = currentWord.Words();
+                                    }
                                     currentWord = scanner.getNextWord();
                                     if (currentWord.Category() == 8) {
                                         currentWord = scanner.getNextWord();
                                         if (currentWord.Category() == 6) {
                                             currentNode.setOperands(currentWord.Words(), 8);
+                                            if (currentWord.Words() > maxSR) {
+                                                maxSR = currentWord.Words();
+                                            }
                                             currentWord = scanner.getNextWord();
                                             if (currentWord.Category() != 10) {
                                                 System.err.println("ERROR " + currentWord.Line() + ": Extraneous argument in sub operation");
@@ -273,16 +310,25 @@ public class Parser {
                         currentWord = scanner.getNextWord();
                         if (currentWord.Category() == 6) {
                             currentNode.setOperands(currentWord.Words(), 0);
+                            if (currentWord.Words() > maxSR) {
+                                maxSR = currentWord.Words();
+                            }
                             currentWord = scanner.getNextWord();
                             if (currentWord.Category() == 7) {
                                 currentWord = scanner.getNextWord();
                                 if (currentWord.Category() == 6) {
                                     currentNode.setOperands(currentWord.Words(), 4);
+                                    if (currentWord.Words() > maxSR) {
+                                        maxSR = currentWord.Words();
+                                    }
                                     currentWord = scanner.getNextWord();
                                     if (currentWord.Category() == 8) {
                                         currentWord = scanner.getNextWord();
                                         if (currentWord.Category() == 6) {
                                             currentNode.setOperands(currentWord.Words(), 8);
+                                            if (currentWord.Words() > maxSR) {
+                                                maxSR = currentWord.Words();
+                                            }
                                             currentWord = scanner.getNextWord();
                                             if (currentWord.Category() != 10) {
                                                 System.err.println("ERROR " + currentWord.Line() + ": Extraneous argument in mult operation");
@@ -325,16 +371,25 @@ public class Parser {
                         currentWord = scanner.getNextWord();
                         if (currentWord.Category() == 6) {
                             currentNode.setOperands(currentWord.Words(), 0);
+                            if (currentWord.Words() > maxSR) {
+                                maxSR = currentWord.Words();
+                            }
                             currentWord = scanner.getNextWord();
                             if (currentWord.Category() == 7) {
                                 currentWord = scanner.getNextWord();
                                 if (currentWord.Category() == 6) {
                                     currentNode.setOperands(currentWord.Words(), 4);
+                                    if (currentWord.Words() > maxSR) {
+                                        maxSR = currentWord.Words();
+                                    }
                                     currentWord = scanner.getNextWord();
                                     if (currentWord.Category() == 8) {
                                         currentWord = scanner.getNextWord();
                                         if (currentWord.Category() == 6) {
                                             currentNode.setOperands(currentWord.Words(), 8);
+                                            if (currentWord.Words() > maxSR) {
+                                                maxSR = currentWord.Words();
+                                            }
                                             currentWord = scanner.getNextWord();
                                             if (currentWord.Category() != 10) {
                                                 System.err.println("ERROR " + currentWord.Line() + ": Extraneous argument in lshift operation");
@@ -377,16 +432,25 @@ public class Parser {
                         currentWord = scanner.getNextWord();
                         if (currentWord.Category() == 6) {
                             currentNode.setOperands(currentWord.Words(), 0);
+                            if (currentWord.Words() > maxSR) {
+                                maxSR = currentWord.Words();
+                            }
                             currentWord = scanner.getNextWord();
                             if (currentWord.Category() == 7) {
                                 currentWord = scanner.getNextWord();
                                 if (currentWord.Category() == 6) {
                                     currentNode.setOperands(currentWord.Words(), 4);
+                                    if (currentWord.Words() > maxSR) {
+                                        maxSR = currentWord.Words();
+                                    }
                                     currentWord = scanner.getNextWord();
                                     if (currentWord.Category() == 8) {
                                         currentWord = scanner.getNextWord();
                                         if (currentWord.Category() == 6) {
                                             currentNode.setOperands(currentWord.Words(), 8);
+                                            if (currentWord.Words() > maxSR) {
+                                                maxSR = currentWord.Words();
+                                            }
                                             currentWord = scanner.getNextWord();
                                             if (currentWord.Category() != 10) {
                                                 System.err.println("ERROR " + currentWord.Line() + ": Extraneous argument in rshift operation");

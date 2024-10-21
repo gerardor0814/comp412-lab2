@@ -73,7 +73,7 @@ public class Main {
         Allocator allocator = new Allocator(parser.getTail(), parser.getHead());
         IRNode currentNode = parser.getHead();
         if (parser.isValid()) {
-            allocator.rename();
+            allocator.rename(parser.getMaxSR());
             allocator.allocate(numRegisters);
             while (currentNode != null) {
                 System.out.println(currentNode.reallocatedString());
@@ -89,7 +89,7 @@ public class Main {
         Allocator allocator = new Allocator(parser.getTail(), parser.getHead());
         IRNode currentNode = parser.getHead();
         if (parser.isValid()) {
-            allocator.rename();
+            allocator.rename(parser.getMaxSR());
             while (currentNode != null) {
                 System.out.println(currentNode.rewrittenString());
                 currentNode = currentNode.getNext();

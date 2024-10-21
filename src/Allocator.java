@@ -15,10 +15,10 @@ public class Allocator {
         this.MAXLIVE = 0;
     }
 
-    public void rename() {
+    public void rename(int maxSR) {
 
-        int[] SRToVR = new int[tail.getIndex()];
-        int[] LastUsed = new int[tail.getIndex()];
+        int[] SRToVR = new int[maxSR + 1];
+        int[] LastUsed = new int[maxSR + 1];
         int index = tail.getIndex();
         int currLive = 0;
         for (int i = 0; i < tail.getIndex(); i++) {
