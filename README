@@ -1,0 +1,17 @@
+//NAME: Gerardo Ramirez del Rio
+//NETID: gr29
+
+To build program run:
+    make clean
+    make build
+
+In the directory with the Makefile
+
+Flags supported:
+    Required arguments:
+        filename  is the pathname (absolute or relative) to the input file
+        k         specifies the number of registers available to the allocator
+
+    At most one of the following two flags:
+            -h        prints this message
+            -x        only for code check 1, scans, parses and prints renamed registers""";
