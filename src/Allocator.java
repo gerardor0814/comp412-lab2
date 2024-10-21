@@ -21,7 +21,7 @@ public class Allocator {
         int[] LastUsed = new int[maxSR + 1];
         int index = tail.getIndex();
         int currLive = 0;
-        for (int i = 0; i < tail.getIndex(); i++) {
+        for (int i = 0; i < maxSR + 1; i++) {
             SRToVR[i] = -1;
             LastUsed[i] = -1;
         }
