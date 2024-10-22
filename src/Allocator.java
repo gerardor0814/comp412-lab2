@@ -143,7 +143,7 @@ public class Allocator {
         int[] PRNU;
         int currPR = -1;
         int currSpillLoc = 32768;
-        int currLastPRNU;
+        int currLastPRNU = -1;
         Stack<Integer> PRStack = new Stack<>();
 
         if (numRegisters < MAXLIVE) {
@@ -178,7 +178,7 @@ public class Allocator {
                             if (!PRStack.empty()) {
                                 currPR = PRStack.pop();
                             } else {
-                                currLastPRNU = pickLastNU(PRNU);
+                                currLastPRNU = pickLastNU(PRNU, currLastPRNU);
                                 VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
                                 VRToPR[PRToVR[currLastPRNU]] = -1;
 
@@ -238,13 +238,14 @@ public class Allocator {
                             PRToVR[currentNode.getPR(1)] = -1;
                             PRNU[currentNode.getPR(1)] = -1;
                             PRStack.push(currentNode.getPR(1));
+                            currLastPRNU = -1;
                         }
 
                         // def
                         if (!PRStack.empty()) {
                             currPR = PRStack.pop();
                         } else {
-                            currLastPRNU = pickLastNU(PRNU);
+                            currLastPRNU = pickLastNU(PRNU, currLastPRNU);
                             VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
                             VRToPR[PRToVR[currLastPRNU]] = -1;
 
@@ -286,7 +287,7 @@ public class Allocator {
                             if (!PRStack.empty()) {
                                 currPR = PRStack.pop();
                             } else {
-                                currLastPRNU = pickLastNU(PRNU);
+                                currLastPRNU = pickLastNU(PRNU, currLastPRNU);
                                 VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
                                 VRToPR[PRToVR[currLastPRNU]] = -1;
 
@@ -352,7 +353,7 @@ public class Allocator {
                             if (!PRStack.empty()) {
                                 currPR = PRStack.pop();
                             } else {
-                                currLastPRNU = pickLastNU(PRNU);
+                                currLastPRNU = pickLastNU(PRNU, currLastPRNU);
                                 VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
                                 VRToPR[PRToVR[currLastPRNU]] = -1;
 
@@ -413,6 +414,7 @@ public class Allocator {
                             PRToVR[currentNode.getPR(1)] = -1;
                             PRNU[currentNode.getPR(1)] = -1;
                             PRStack.push(currentNode.getPR(1));
+                            currLastPRNU = -1;
                         }
 
                         if (currentNode.getNU(3) == -1 && !(PRToVR[currentNode.getPR(3)] == -1)) {
@@ -420,6 +422,7 @@ public class Allocator {
                             PRToVR[currentNode.getPR(3)] = -1;
                             PRNU[currentNode.getPR(3)] = -1;
                             PRStack.push(currentNode.getPR(3));
+                            currLastPRNU = -1;
                         }
                     }
                 }
@@ -430,7 +433,7 @@ public class Allocator {
                     if (!PRStack.empty()) {
                         currPR = PRStack.pop();
                     } else {
-                        currLastPRNU = pickLastNU(PRNU);
+                        currLastPRNU = pickLastNU(PRNU, currLastPRNU);
                         VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
                         VRToPR[PRToVR[currLastPRNU]] = -1;
 
@@ -473,7 +476,7 @@ public class Allocator {
                         if (!PRStack.empty()) {
                             currPR = PRStack.pop();
                         } else {
-                            currLastPRNU = pickLastNU(PRNU);
+                            currLastPRNU = pickLastNU(PRNU, currLastPRNU);
                             VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
                             VRToPR[PRToVR[currLastPRNU]] = -1;
 
@@ -535,7 +538,7 @@ public class Allocator {
                         if (!PRStack.empty()) {
                             currPR = PRStack.pop();
                         } else {
-                            currLastPRNU = pickLastNU(PRNU);
+                            currLastPRNU = pickLastNU(PRNU, currLastPRNU);
                             VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
                             VRToPR[PRToVR[currLastPRNU]] = -1;
 
@@ -595,6 +598,7 @@ public class Allocator {
                         PRToVR[currentNode.getPR(1)] = -1;
                         PRNU[currentNode.getPR(1)] = -1;
                         PRStack.push(currentNode.getPR(1));
+                        currLastPRNU = -1;
                     }
 
                     if (currentNode.getNU(2) == -1 && !(PRToVR[currentNode.getPR(2)] == -1)) {
@@ -602,6 +606,7 @@ public class Allocator {
                         PRToVR[currentNode.getPR(2)] = -1;
                         PRNU[currentNode.getPR(2)] = -1;
                         PRStack.push(currentNode.getPR(2));
+                        currLastPRNU = -1;
                     }
 
                     // def
@@ -609,7 +614,7 @@ public class Allocator {
                     if (!PRStack.empty()) {
                         currPR = PRStack.pop();
                     } else {
-                        currLastPRNU = pickLastNU(PRNU);
+                        currLastPRNU = pickLastNU(PRNU, currLastPRNU);
                         VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
                         VRToPR[PRToVR[currLastPRNU]] = -1;
 
@@ -643,14 +648,17 @@ public class Allocator {
                 }
             }
             currentNode = currentNode.getNext();
+            currLastPRNU = -1;
         }
     }
 
-    private static int pickLastNU(int[] PRNU) {
+    private static int pickLastNU(int[] PRNU, int sameUse) {
         int max = 0;
         for (int i = 0; i < PRNU.length; i++) {
-            if (PRNU[i] > PRNU[max]) {
-                max = i;
+            if (i != sameUse) {
+                if (PRNU[i] > PRNU[max]) {
+                    max = i;
+                }
             }
         }
         return max;
