@@ -667,16 +667,18 @@ public class Allocator {
     }
 
     private static int pickLastNU(int[] PRNU, int sameUse) {
-        int max = 0;
+        int max = Integer.MIN_VALUE;
+        int maxIndex = 0;
         for (int i = 0; i < PRNU.length; i++) {
             if (i != sameUse) {
-                if (PRNU[i] > PRNU[max]) {
-                    max = i;
+                if (PRNU[i] > max) {
+                    max = PRNU[i];
+                    maxIndex = i;
                 } else if (PRNU[i] == -1) {
-                    max = i;
+                    maxIndex = i;
                 }
             }
         }
-        return max;
+        return maxIndex;
     }
 }
