@@ -174,6 +174,7 @@ public class Allocator {
                         // use
                         if (VRToPR[currentNode.getVR(1)] != -1) {
                             currentNode.setOperands(VRToPR[currentNode.getVR(1)], 2);
+                            currLastPRNU = VRToPR[currentNode.getVR(1)];
                         } else {
                             if (!PRStack.empty()) {
                                 currPR = PRStack.pop();
@@ -287,6 +288,7 @@ public class Allocator {
                         // use
                         if (VRToPR[currentNode.getVR(1)] != -1) {
                             currentNode.setOperands(VRToPR[currentNode.getVR(1)], 2);
+                            currLastPRNU = VRToPR[currentNode.getVR(1)];
                         } else {
                             if (!PRStack.empty()) {
                                 currPR = PRStack.pop();
@@ -357,7 +359,6 @@ public class Allocator {
                         } else {
                             if (!PRStack.empty()) {
                                 currPR = PRStack.pop();
-                                currLastPRNU = currPR;
                             } else {
                                 currLastPRNU = pickLastNU(PRNU, currLastPRNU);
                                 VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
@@ -480,11 +481,11 @@ public class Allocator {
                     // use
                     if (VRToPR[currentNode.getVR(1)] != -1) {
                         currentNode.setOperands(VRToPR[currentNode.getVR(1)], 2);
+                        currLastPRNU = VRToPR[currentNode.getVR(1)];
                     } else {
                         if (!PRStack.empty()) {
                             currPR = PRStack.pop();
                             currLastPRNU = currPR;
-
                         } else {
                             currLastPRNU = pickLastNU(PRNU, currLastPRNU);
                             VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
@@ -544,11 +545,11 @@ public class Allocator {
                     // use
                     if (VRToPR[currentNode.getVR(2)] != -1) {
                         currentNode.setOperands(VRToPR[currentNode.getVR(2)], 6);
+                        currLastPRNU = VRToPR[currentNode.getVR(2)];
                     } else {
                         if (!PRStack.empty()) {
                             currPR = PRStack.pop();
                             currLastPRNU = currPR;
-
                         } else {
                             currLastPRNU = pickLastNU(PRNU, currLastPRNU);
                             VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
@@ -625,8 +626,6 @@ public class Allocator {
 
                     if (!PRStack.empty()) {
                         currPR = PRStack.pop();
-                        currLastPRNU = currPR;
-
                     } else {
                         currLastPRNU = pickLastNU(PRNU, currLastPRNU);
                         VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
