@@ -15,7 +15,7 @@
 public class Parser {
 
     private final Scanner scanner;
-    private final IRNode head;
+    private IRNode head;
     private IRNode tail;
     private boolean valid;
     private int count;

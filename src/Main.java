@@ -71,10 +71,9 @@ public class Main {
     public static void run(Parser parser, int numRegisters) {
         parser.parse();
         Allocator allocator = new Allocator(parser.getTail(), parser.getHead());
-        IRNode currentNode = parser.getHead();
         if (parser.isValid()) {
             allocator.rename(parser.getMaxSR());
-            allocator.allocate(numRegisters);
+            IRNode currentNode = allocator.allocate(numRegisters);
             while (currentNode != null) {
                 System.out.println(currentNode.reallocatedString());
                 currentNode = currentNode.getNext();
