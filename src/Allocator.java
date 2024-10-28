@@ -224,9 +224,14 @@ public class Allocator {
                                 tempLoadI.setOperands(currPR, 10);
 
                                 tempLoadI.setPrev(currentNode.getPrev());
-                                currentNode.getPrev().setNext(tempLoadI);
+                                if (currentNode.getPrev() != null) {
+                                    currentNode.getPrev().setNext(tempLoadI);
+                                }
                                 tempLoadI.setNext(currentNode);
                                 currentNode.setPrev(tempLoadI);
+                                if (currentNode == this.head) {
+                                    this.head = currentNode.getPrev();
+                                }
                             } else {
                                 IRNode tempLoadI = new IRNode();
                                 IRNode tempLoad = new IRNode();
@@ -351,9 +356,14 @@ public class Allocator {
                                 tempLoadI.setOperands(currPR, 10);
 
                                 tempLoadI.setPrev(currentNode.getPrev());
-                                currentNode.getPrev().setNext(tempLoadI);
+                                if (currentNode.getPrev() != null) {
+                                    currentNode.getPrev().setNext(tempLoadI);
+                                }
                                 tempLoadI.setNext(currentNode);
                                 currentNode.setPrev(tempLoadI);
+                                if (currentNode == this.head) {
+                                    this.head = currentNode.getPrev();
+                                }
                             } else {
                                 IRNode tempLoadI = new IRNode();
                                 tempLoadI.setOpType(1, 0);
