@@ -302,6 +302,14 @@ public class Allocator {
                         PRNU[currPR] = currentNode.getNU(3);
                         currentNode.setOperands(currPR, 10);
 
+                        if (currentNode.getNU(3) == -1 && !(PRToVR[currentNode.getPR(3)] == -1)) {
+                            VRToPR[PRToVR[currentNode.getPR(3)]] = -1;
+                            PRToVR[currentNode.getPR(3)] = -1;
+                            PRNU[currentNode.getPR(3)] = -1;
+                            PRStack.push(currentNode.getPR(3));
+                            System.err.println("ERROR: Definition of register not used");
+                        }
+
                     } else {
                         // store
 
@@ -721,6 +729,14 @@ public class Allocator {
                     VRToPR[currentNode.getVR(3)] = currPR;
                     currentNode.setOperands(currPR, 10);
                     PRNU[VRToPR[currentNode.getVR(3)]] = currentNode.getNU(3);
+
+                    if (currentNode.getNU(3) == -1 && !(PRToVR[currentNode.getPR(3)] == -1)) {
+                        VRToPR[PRToVR[currentNode.getPR(3)]] = -1;
+                        PRToVR[currentNode.getPR(3)] = -1;
+                        PRNU[currentNode.getPR(3)] = -1;
+                        PRStack.push(currentNode.getPR(3));
+                        System.err.println("ERROR: Definition of register not used");
+                    }
                 }
             }
             currentNode = currentNode.getNext();
