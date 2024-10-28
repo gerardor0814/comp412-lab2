@@ -139,6 +139,7 @@ public class Allocator {
     public void allocate(int numRegisters) {
         int[] VRToPR = new int[this.VRName + 1];
         int[] VRToSpillLocation = new int[this.VRName + 1];
+        boolean[] VRIsLoadI = new boolean[this.VRName + 1];
         int[] PRToVR;
         int[] PRNU;
         int currPR = -1;
@@ -179,11 +180,95 @@ public class Allocator {
                             if (!PRStack.empty()) {
                                 currPR = PRStack.pop();
                                 currLastPRNU = currPR;
-
                             } else {
                                 currLastPRNU = pickLastNU(PRNU, currLastPRNU);
-                                VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
+                                currPR = currLastPRNU;
                                 VRToPR[PRToVR[currLastPRNU]] = -1;
+                                if (!VRIsLoadI[PRToVR[currLastPRNU]]) {
+                                    VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
+
+                                    IRNode tempLoadI = new IRNode();
+                                    tempLoadI.setOpType(1, 0);
+                                    tempLoadI.setOperands(currSpillLoc, 0);
+                                    tempLoadI.setOperands(numRegisters - 1, 10);
+                                    tempLoadI.setOperands(currentNode.getIndex(), 11);
+
+
+                                    IRNode tempStore = new IRNode();
+                                    tempStore.setOpType(0, 1);
+                                    tempStore.setOperands(PRToVR[currLastPRNU], 1);
+                                    tempStore.setOperands(currLastPRNU, 2);
+                                    tempStore.setOperands(numRegisters - 1, 10);
+
+                                    currentNode.getPrev().setNext(tempLoadI);
+                                    tempLoadI.setPrev(currentNode.getPrev());
+                                    tempLoadI.setNext(tempStore);
+                                    tempStore.setPrev(tempLoadI);
+                                    tempStore.setNext(currentNode);
+                                    currentNode.setPrev(tempStore);
+                                    currSpillLoc += 4;
+                                }
+                            }
+
+                            PRToVR[currPR] = currentNode.getVR(1);
+                            VRToPR[currentNode.getVR(1)] = currPR;
+                            PRNU[currPR] = currentNode.getNU(1);
+                            currentNode.setOperands(currPR, 2);
+
+
+                            if (VRIsLoadI[currentNode.getVR(1)]) {
+                                IRNode tempLoadI = new IRNode();
+                                tempLoadI.setOpType(1, 0);
+                                tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(1)], 0);
+                                tempLoadI.setOperands(currentNode.getIndex(), 11);
+                                tempLoadI.setOperands(currPR, 10);
+
+                                tempLoadI.setPrev(currentNode.getPrev());
+                                currentNode.getPrev().setNext(tempLoadI);
+                                tempLoadI.setNext(currentNode);
+                                currentNode.setPrev(tempLoadI);
+                            } else {
+                                IRNode tempLoadI = new IRNode();
+                                IRNode tempLoad = new IRNode();
+
+                                tempLoadI.setOpType(1, 0);
+                                tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(1)], 0);
+                                tempLoadI.setOperands(numRegisters - 1, 10);
+                                tempLoadI.setOperands(currentNode.getIndex(), 11);
+
+                                tempLoad.setOpType(0, 0);
+                                tempLoad.setOperands(numRegisters - 1, 2);
+                                tempLoad.setOperands(currentNode.getVR(1), 9);
+
+                                tempLoad.setOperands(currPR, 10);
+                                tempLoad.setOperands(currentNode.getIndex(), 11);
+
+                                currentNode.getPrev().setNext(tempLoadI);
+                                tempLoadI.setPrev(currentNode.getPrev());
+                                tempLoadI.setNext(tempLoad);
+                                tempLoad.setPrev(tempLoadI);
+                                tempLoad.setNext(currentNode);
+                                currentNode.setPrev(tempLoad);
+                            }
+                        }
+
+                        if (currentNode.getNU(1) == -1 && !(PRToVR[currentNode.getPR(1)] == -1)) {
+                            VRToPR[PRToVR[currentNode.getPR(1)]] = -1;
+                            PRToVR[currentNode.getPR(1)] = -1;
+                            PRNU[currentNode.getPR(1)] = -1;
+                            PRStack.push(currentNode.getPR(1));
+                            currLastPRNU = -1;
+                        }
+
+                        // def
+                        if (!PRStack.empty()) {
+                            currPR = PRStack.pop();
+                        } else {
+                            currLastPRNU = pickLastNU(PRNU, currLastPRNU);
+                            VRToPR[PRToVR[currLastPRNU]] = -1;
+                            currPR = currLastPRNU;
+                            if (!VRIsLoadI[PRToVR[currLastPRNU]]) {
+                                VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
 
                                 IRNode tempLoadI = new IRNode();
                                 tempLoadI.setOpType(1, 0);
@@ -205,77 +290,7 @@ public class Allocator {
                                 tempStore.setNext(currentNode);
                                 currentNode.setPrev(tempStore);
                                 currSpillLoc += 4;
-                                currPR = currLastPRNU;
                             }
-
-                            PRToVR[currPR] = currentNode.getVR(1);
-                            VRToPR[currentNode.getVR(1)] = currPR;
-                            PRNU[currPR] = currentNode.getNU(1);
-                            currentNode.setOperands(currPR, 2);
-
-                            IRNode tempLoadI = new IRNode();
-                            IRNode tempLoad = new IRNode();
-
-                            tempLoadI.setOpType(1, 0);
-                            tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(1)], 0);
-                            tempLoadI.setOperands(numRegisters - 1, 10);
-                            tempLoadI.setOperands(currentNode.getIndex(), 11);
-
-                            tempLoad.setOpType(0, 0);
-                            tempLoad.setOperands(numRegisters - 1, 2);
-                            tempLoad.setOperands(currentNode.getVR(1), 9);
-
-                            tempLoad.setOperands(currPR, 10);
-                            tempLoad.setOperands(currentNode.getIndex(), 11);
-
-                            currentNode.getPrev().setNext(tempLoadI);
-                            tempLoadI.setPrev(currentNode.getPrev());
-                            tempLoadI.setNext(tempLoad);
-                            tempLoad.setPrev(tempLoadI);
-                            tempLoad.setNext(currentNode);
-                            currentNode.setPrev(tempLoad);
-                        }
-
-                        if (currentNode.getNU(1) == -1 && !(PRToVR[currentNode.getPR(1)] == -1)) {
-                            VRToPR[PRToVR[currentNode.getPR(1)]] = -1;
-                            PRToVR[currentNode.getPR(1)] = -1;
-                            PRNU[currentNode.getPR(1)] = -1;
-                            PRStack.push(currentNode.getPR(1));
-                            currLastPRNU = -1;
-                        }
-
-                        // def
-                        if (!PRStack.empty()) {
-                            currPR = PRStack.pop();
-                            currLastPRNU = currPR;
-
-                        } else {
-                            currLastPRNU = pickLastNU(PRNU, currLastPRNU);
-                            VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
-                            VRToPR[PRToVR[currLastPRNU]] = -1;
-
-                            IRNode tempLoadI = new IRNode();
-                            tempLoadI.setOpType(1, 0);
-                            tempLoadI.setOperands(currSpillLoc, 0);
-                            tempLoadI.setOperands(numRegisters - 1, 10);
-                            tempLoadI.setOperands(currentNode.getIndex(), 11);
-
-
-                            IRNode tempStore = new IRNode();
-                            tempStore.setOpType(0, 1);
-                            tempStore.setOperands(PRToVR[currLastPRNU], 1);
-                            tempStore.setOperands(currLastPRNU, 2);
-                            tempStore.setOperands(numRegisters - 1, 10);
-
-                            currentNode.getPrev().setNext(tempLoadI);
-                            tempLoadI.setPrev(currentNode.getPrev());
-                            tempLoadI.setNext(tempStore);
-                            tempStore.setPrev(tempLoadI);
-                            tempStore.setNext(currentNode);
-                            currentNode.setPrev(tempStore);
-                            currSpillLoc += 4;
-                            currPR = currLastPRNU;
-
                         }
                         PRToVR[currPR] = currentNode.getVR(3);
                         VRToPR[currentNode.getVR(3)] = currPR;
@@ -295,8 +310,230 @@ public class Allocator {
                                 currLastPRNU = currPR;
                             } else {
                                 currLastPRNU = pickLastNU(PRNU, currLastPRNU);
-                                VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
+                                currPR = currLastPRNU;
                                 VRToPR[PRToVR[currLastPRNU]] = -1;
+
+                                if (!VRIsLoadI[PRToVR[currLastPRNU]]) {
+                                    VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
+
+                                    IRNode tempLoadI = new IRNode();
+                                    tempLoadI.setOpType(1, 0);
+                                    tempLoadI.setOperands(currSpillLoc, 0);
+                                    tempLoadI.setOperands(numRegisters - 1, 10);
+                                    tempLoadI.setOperands(currentNode.getIndex(), 11);
+
+
+                                    IRNode tempStore = new IRNode();
+                                    tempStore.setOpType(0, 1);
+                                    tempStore.setOperands(PRToVR[currLastPRNU], 1);
+                                    tempStore.setOperands(currLastPRNU, 2);
+                                    tempStore.setOperands(numRegisters - 1, 10);
+
+                                    currentNode.getPrev().setNext(tempLoadI);
+                                    tempLoadI.setPrev(currentNode.getPrev());
+                                    tempLoadI.setNext(tempStore);
+                                    tempStore.setPrev(tempLoadI);
+                                    tempStore.setNext(currentNode);
+                                    currentNode.setPrev(tempStore);
+                                    currSpillLoc += 4;
+                                }
+                            }
+                            PRToVR[currPR] = currentNode.getVR(1);
+                            VRToPR[currentNode.getVR(1)] = currPR;
+                            PRNU[currPR] = currentNode.getNU(1);
+                            currentNode.setOperands(currPR, 2);
+
+                            if (VRIsLoadI[currentNode.getVR(1)]) {
+                                IRNode tempLoadI = new IRNode();
+                                tempLoadI.setOpType(1, 0);
+                                tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(1)], 0);
+                                tempLoadI.setOperands(currentNode.getIndex(), 11);
+                                tempLoadI.setOperands(currPR, 10);
+
+                                tempLoadI.setPrev(currentNode.getPrev());
+                                currentNode.getPrev().setNext(tempLoadI);
+                                tempLoadI.setNext(currentNode);
+                                currentNode.setPrev(tempLoadI);
+                            } else {
+                                IRNode tempLoadI = new IRNode();
+                                tempLoadI.setOpType(1, 0);
+                                tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(1)], 0);
+                                tempLoadI.setOperands(numRegisters - 1, 10);
+                                tempLoadI.setOperands(currentNode.getIndex(), 11);
+
+                                IRNode tempLoad = new IRNode();
+                                tempLoad.setOpType(0, 0);
+                                tempLoad.setOperands(numRegisters - 1, 2);
+                                tempLoad.setOperands(currentNode.getVR(1), 9);
+
+                                tempLoad.setOperands(currPR, 10);
+                                tempLoad.setOperands(currentNode.getIndex(), 11);
+
+                                currentNode.getPrev().setNext(tempLoadI);
+                                tempLoadI.setPrev(currentNode.getPrev());
+                                tempLoadI.setNext(tempLoad);
+                                tempLoad.setPrev(tempLoadI);
+                                tempLoad.setNext(currentNode);
+                                currentNode.setPrev(tempLoad);
+
+                                PRToVR[currPR] = currentNode.getVR(1);
+                                VRToPR[currentNode.getVR(1)] = currPR;
+                                PRNU[currPR] = currentNode.getNU(1);
+                                currentNode.setOperands(currPR, 2);
+                            }
+                        }
+
+                        // use
+                        if (VRToPR[currentNode.getVR(3)] != -1) {
+                            currentNode.setOperands(VRToPR[currentNode.getVR(3)], 10);
+                        } else {
+                            if (!PRStack.empty()) {
+                                currPR = PRStack.pop();
+                            } else {
+                                currLastPRNU = pickLastNU(PRNU, currLastPRNU);
+                                currPR = currLastPRNU;
+                                VRToPR[PRToVR[currLastPRNU]] = -1;
+                                if (!VRIsLoadI[PRToVR[currLastPRNU]]) {
+                                    VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
+
+                                    IRNode tempLoadI = new IRNode();
+                                    tempLoadI.setOpType(1, 0);
+                                    tempLoadI.setOperands(currSpillLoc, 0);
+                                    tempLoadI.setOperands(numRegisters - 1, 10);
+                                    tempLoadI.setOperands(currentNode.getIndex(), 11);
+
+
+                                    IRNode tempStore = new IRNode();
+                                    tempStore.setOpType(0, 1);
+                                    tempStore.setOperands(PRToVR[currLastPRNU], 1);
+                                    tempStore.setOperands(currLastPRNU, 2);
+                                    tempStore.setOperands(numRegisters - 1, 10);
+
+                                    currentNode.getPrev().setNext(tempLoadI);
+                                    tempLoadI.setPrev(currentNode.getPrev());
+                                    tempLoadI.setNext(tempStore);
+                                    tempStore.setPrev(tempLoadI);
+                                    tempStore.setNext(currentNode);
+                                    currentNode.setPrev(tempStore);
+                                    currSpillLoc += 4;
+                                }
+                            }
+
+                            PRToVR[currPR] = currentNode.getVR(3);
+                            VRToPR[currentNode.getVR(3)] = currPR;
+                            PRNU[currPR] = currentNode.getNU(3);
+                            currentNode.setOperands(currPR, 10);
+
+                            if (VRIsLoadI[currentNode.getVR(3)]) {
+                                IRNode tempLoadI = new IRNode();
+                                tempLoadI.setOpType(1, 0);
+                                tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(3)], 0);
+                                tempLoadI.setOperands(currentNode.getIndex(), 11);
+                                tempLoadI.setOperands(currPR, 10);
+
+                                tempLoadI.setPrev(currentNode.getPrev());
+                                currentNode.getPrev().setNext(tempLoadI);
+                                tempLoadI.setNext(currentNode);
+                                currentNode.setPrev(tempLoadI);
+                            } else {
+                                IRNode tempLoadI = new IRNode();
+                                tempLoadI.setOpType(1, 0);
+                                tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(3)], 0);
+                                tempLoadI.setOperands(numRegisters - 1, 10);
+                                tempLoadI.setOperands(currentNode.getIndex(), 11);
+
+                                IRNode tempLoad = new IRNode();
+                                tempLoad.setOpType(0, 0);
+                                tempLoad.setOperands(numRegisters - 1, 2);
+                                tempLoad.setOperands(currentNode.getVR(3), 9);
+
+                                tempLoad.setOperands(currPR, 10);
+                                tempLoad.setOperands(currentNode.getIndex(), 11);
+
+                                currentNode.getPrev().setNext(tempLoadI);
+                                tempLoadI.setPrev(currentNode.getPrev());
+                                tempLoadI.setNext(tempLoad);
+                                tempLoad.setPrev(tempLoadI);
+                                tempLoad.setNext(currentNode);
+                                currentNode.setPrev(tempLoad);
+                            }
+                        }
+
+                        if (currentNode.getNU(1) == -1 && !(PRToVR[currentNode.getPR(1)] == -1)) {
+                            VRToPR[PRToVR[currentNode.getPR(1)]] = -1;
+                            PRToVR[currentNode.getPR(1)] = -1;
+                            PRNU[currentNode.getPR(1)] = -1;
+                            PRStack.push(currentNode.getPR(1));
+                        }
+
+                        if (currentNode.getNU(3) == -1 && !(PRToVR[currentNode.getPR(3)] == -1)) {
+                            VRToPR[PRToVR[currentNode.getPR(3)]] = -1;
+                            PRToVR[currentNode.getPR(3)] = -1;
+                            PRNU[currentNode.getPR(3)] = -1;
+                            PRStack.push(currentNode.getPR(3));
+                        }
+                    }
+                }
+                case 1 -> {
+                    // loadI
+
+                    // def
+                    if (!PRStack.empty()) {
+                        currPR = PRStack.pop();
+                    } else {
+                        currLastPRNU = pickLastNU(PRNU, currLastPRNU);
+                        VRToPR[PRToVR[currLastPRNU]] = -1;
+                        currPR = currLastPRNU;
+                        if (!VRIsLoadI[PRToVR[currLastPRNU]]) {
+                            VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
+
+                            IRNode tempLoadI = new IRNode();
+                            tempLoadI.setOpType(1, 0);
+                            tempLoadI.setOperands(currSpillLoc, 0);
+                            tempLoadI.setOperands(numRegisters - 1, 10);
+                            tempLoadI.setOperands(currentNode.getIndex(), 11);
+
+
+                            IRNode tempStore = new IRNode();
+                            tempStore.setOpType(0, 1);
+                            tempStore.setOperands(PRToVR[currLastPRNU], 1);
+                            tempStore.setOperands(currLastPRNU, 2);
+                            tempStore.setOperands(numRegisters - 1, 10);
+
+                            currentNode.getPrev().setNext(tempLoadI);
+                            tempLoadI.setPrev(currentNode.getPrev());
+                            tempLoadI.setNext(tempStore);
+                            tempStore.setPrev(tempLoadI);
+                            tempStore.setNext(currentNode);
+                            currentNode.setPrev(tempStore);
+                            currSpillLoc += 4;
+                        }
+                    }
+
+                    PRToVR[currPR] = currentNode.getVR(3);
+                    VRToPR[currentNode.getVR(3)] = currPR;
+                    VRIsLoadI[currentNode.getVR(3)] = true;
+                    VRToSpillLocation[currentNode.getVR(3)] = currentNode.getSR(1);
+                    PRNU[VRToPR[currentNode.getVR(3)]] = currentNode.getNU(3);
+                    currentNode.setOperands(currPR, 10);
+                }
+                case 2 -> {
+                    // arith
+
+                    // use
+                    if (VRToPR[currentNode.getVR(1)] != -1) {
+                        currentNode.setOperands(VRToPR[currentNode.getVR(1)], 2);
+                        currLastPRNU = VRToPR[currentNode.getVR(1)];
+                    } else {
+                        if (!PRStack.empty()) {
+                            currPR = PRStack.pop();
+                            currLastPRNU = currPR;
+                        } else {
+                            currLastPRNU = pickLastNU(PRNU, currLastPRNU);
+                            currPR = currLastPRNU;
+                            VRToPR[PRToVR[currLastPRNU]] = -1;
+                            if (!VRIsLoadI[PRToVR[currLastPRNU]]) {
+                                VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
 
                                 IRNode tempLoadI = new IRNode();
                                 tempLoadI.setOpType(1, 0);
@@ -318,14 +555,26 @@ public class Allocator {
                                 tempStore.setNext(currentNode);
                                 currentNode.setPrev(tempStore);
                                 currSpillLoc += 4;
-                                currPR = currLastPRNU;
                             }
+                        }
 
-                            PRToVR[currPR] = currentNode.getVR(1);
-                            VRToPR[currentNode.getVR(1)] = currPR;
-                            PRNU[currPR] = currentNode.getNU(1);
-                            currentNode.setOperands(currPR, 2);
+                        PRToVR[currPR] = currentNode.getVR(1);
+                        VRToPR[currentNode.getVR(1)] = currPR;
+                        PRNU[currPR] = currentNode.getNU(1);
+                        currentNode.setOperands(currPR, 2);
 
+                        if (VRIsLoadI[currentNode.getVR(1)]) {
+                            IRNode tempLoadI = new IRNode();
+                            tempLoadI.setOpType(1, 0);
+                            tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(1)], 0);
+                            tempLoadI.setOperands(currentNode.getIndex(), 11);
+                            tempLoadI.setOperands(currPR, 10);
+
+                            tempLoadI.setPrev(currentNode.getPrev());
+                            currentNode.getPrev().setNext(tempLoadI);
+                            tempLoadI.setNext(currentNode);
+                            currentNode.setPrev(tempLoadI);
+                        } else {
                             IRNode tempLoadI = new IRNode();
                             tempLoadI.setOpType(1, 0);
                             tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(1)], 0);
@@ -346,23 +595,23 @@ public class Allocator {
                             tempLoad.setPrev(tempLoadI);
                             tempLoad.setNext(currentNode);
                             currentNode.setPrev(tempLoad);
-
-                            PRToVR[currPR] = currentNode.getVR(1);
-                            VRToPR[currentNode.getVR(1)] = currPR;
-                            PRNU[currPR] = currentNode.getNU(1);
-                            currentNode.setOperands(currPR, 2);
                         }
+                    }
 
-                        // use
-                        if (VRToPR[currentNode.getVR(3)] != -1) {
-                            currentNode.setOperands(VRToPR[currentNode.getVR(3)], 10);
+                    // use
+                    if (VRToPR[currentNode.getVR(2)] != -1) {
+                        currentNode.setOperands(VRToPR[currentNode.getVR(2)], 6);
+                        currLastPRNU = VRToPR[currentNode.getVR(2)];
+                    } else {
+                        if (!PRStack.empty()) {
+                            currPR = PRStack.pop();
+                            currLastPRNU = currPR;
                         } else {
-                            if (!PRStack.empty()) {
-                                currPR = PRStack.pop();
-                            } else {
-                                currLastPRNU = pickLastNU(PRNU, currLastPRNU);
+                            currLastPRNU = pickLastNU(PRNU, currLastPRNU);
+                            currPR = currLastPRNU;
+                            VRToPR[PRToVR[currLastPRNU]] = -1;
+                            if (!VRIsLoadI[PRToVR[currLastPRNU]]) {
                                 VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
-                                VRToPR[PRToVR[currLastPRNU]] = -1;
 
                                 IRNode tempLoadI = new IRNode();
                                 tempLoadI.setOpType(1, 0);
@@ -384,25 +633,36 @@ public class Allocator {
                                 tempStore.setNext(currentNode);
                                 currentNode.setPrev(tempStore);
                                 currSpillLoc += 4;
-                                currPR = currLastPRNU;
-
                             }
+                        }
 
-                            PRToVR[currPR] = currentNode.getVR(3);
-                            VRToPR[currentNode.getVR(3)] = currPR;
-                            PRNU[currPR] = currentNode.getNU(3);
-                            currentNode.setOperands(currPR, 10);
+                        PRToVR[currPR] = currentNode.getVR(2);
+                        VRToPR[currentNode.getVR(2)] = currPR;
+                        PRNU[currPR] = currentNode.getNU(2);
+                        currentNode.setOperands(currPR, 6);
 
+                        if (VRIsLoadI[currentNode.getVR(2)]) {
                             IRNode tempLoadI = new IRNode();
                             tempLoadI.setOpType(1, 0);
-                            tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(3)], 0);
+                            tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(2)], 0);
+                            tempLoadI.setOperands(currentNode.getIndex(), 11);
+                            tempLoadI.setOperands(currPR, 10);
+
+                            tempLoadI.setPrev(currentNode.getPrev());
+                            currentNode.getPrev().setNext(tempLoadI);
+                            tempLoadI.setNext(currentNode);
+                            currentNode.setPrev(tempLoadI);
+                        } else {
+                            IRNode tempLoadI = new IRNode();
+                            tempLoadI.setOpType(1, 0);
+                            tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(2)], 0);
                             tempLoadI.setOperands(numRegisters - 1, 10);
                             tempLoadI.setOperands(currentNode.getIndex(), 11);
 
                             IRNode tempLoad = new IRNode();
                             tempLoad.setOpType(0, 0);
                             tempLoad.setOperands(numRegisters - 1, 2);
-                            tempLoad.setOperands(currentNode.getVR(3), 9);
+                            tempLoad.setOperands(currentNode.getVR(2), 9);
 
                             tempLoad.setOperands(currPR, 10);
                             tempLoad.setOperands(currentNode.getIndex(), 11);
@@ -413,197 +673,7 @@ public class Allocator {
                             tempLoad.setPrev(tempLoadI);
                             tempLoad.setNext(currentNode);
                             currentNode.setPrev(tempLoad);
-
                         }
-
-                        if (currentNode.getNU(1) == -1 && !(PRToVR[currentNode.getPR(1)] == -1)) {
-                            VRToPR[PRToVR[currentNode.getPR(1)]] = -1;
-                            PRToVR[currentNode.getPR(1)] = -1;
-                            PRNU[currentNode.getPR(1)] = -1;
-                            PRStack.push(currentNode.getPR(1));
-                            currLastPRNU = -1;
-                        }
-
-                        if (currentNode.getNU(3) == -1 && !(PRToVR[currentNode.getPR(3)] == -1)) {
-                            VRToPR[PRToVR[currentNode.getPR(3)]] = -1;
-                            PRToVR[currentNode.getPR(3)] = -1;
-                            PRNU[currentNode.getPR(3)] = -1;
-                            PRStack.push(currentNode.getPR(3));
-                            currLastPRNU = -1;
-                        }
-                    }
-                }
-                case 1 -> {
-                    // loadI
-
-                    // def
-                    if (!PRStack.empty()) {
-                        currPR = PRStack.pop();
-                        currLastPRNU = currPR;
-
-                    } else {
-                        currLastPRNU = pickLastNU(PRNU, currLastPRNU);
-                        VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
-                        VRToPR[PRToVR[currLastPRNU]] = -1;
-
-                        IRNode tempLoadI = new IRNode();
-                        tempLoadI.setOpType(1, 0);
-                        tempLoadI.setOperands(currSpillLoc, 0);
-                        tempLoadI.setOperands(numRegisters - 1, 10);
-                        tempLoadI.setOperands(currentNode.getIndex(), 11);
-
-
-                        IRNode tempStore = new IRNode();
-                        tempStore.setOpType(0, 1);
-                        tempStore.setOperands(PRToVR[currLastPRNU], 1);
-                        tempStore.setOperands(currLastPRNU, 2);
-                        tempStore.setOperands(numRegisters - 1, 10);
-
-                        currentNode.getPrev().setNext(tempLoadI);
-                        tempLoadI.setPrev(currentNode.getPrev());
-                        tempLoadI.setNext(tempStore);
-                        tempStore.setPrev(tempLoadI);
-                        tempStore.setNext(currentNode);
-                        currentNode.setPrev(tempStore);
-                        currSpillLoc += 4;
-                        currPR = currLastPRNU;
-                    }
-
-                    PRToVR[currPR] = currentNode.getVR(3);
-                    VRToPR[currentNode.getVR(3)] = currPR;
-                    PRNU[VRToPR[currentNode.getVR(3)]] = currentNode.getNU(3);
-                    currentNode.setOperands(currPR, 10);
-
-                }
-                case 2 -> {
-                    // arith
-
-                    // use
-                    if (VRToPR[currentNode.getVR(1)] != -1) {
-                        currentNode.setOperands(VRToPR[currentNode.getVR(1)], 2);
-                        currLastPRNU = VRToPR[currentNode.getVR(1)];
-                    } else {
-                        if (!PRStack.empty()) {
-                            currPR = PRStack.pop();
-                            currLastPRNU = currPR;
-                        } else {
-                            currLastPRNU = pickLastNU(PRNU, currLastPRNU);
-                            VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
-                            VRToPR[PRToVR[currLastPRNU]] = -1;
-
-                            IRNode tempLoadI = new IRNode();
-                            tempLoadI.setOpType(1, 0);
-                            tempLoadI.setOperands(currSpillLoc, 0);
-                            tempLoadI.setOperands(numRegisters - 1, 10);
-                            tempLoadI.setOperands(currentNode.getIndex(), 11);
-
-
-                            IRNode tempStore = new IRNode();
-                            tempStore.setOpType(0, 1);
-                            tempStore.setOperands(PRToVR[currLastPRNU], 1);
-                            tempStore.setOperands(currLastPRNU, 2);
-                            tempStore.setOperands(numRegisters - 1, 10);
-
-                            currentNode.getPrev().setNext(tempLoadI);
-                            tempLoadI.setPrev(currentNode.getPrev());
-                            tempLoadI.setNext(tempStore);
-                            tempStore.setPrev(tempLoadI);
-                            tempStore.setNext(currentNode);
-                            currentNode.setPrev(tempStore);
-                            currSpillLoc += 4;
-                            currPR = currLastPRNU;
-
-                        }
-
-                        PRToVR[currPR] = currentNode.getVR(1);
-                        VRToPR[currentNode.getVR(1)] = currPR;
-                        PRNU[currPR] = currentNode.getNU(1);
-                        currentNode.setOperands(currPR, 2);
-
-                        IRNode tempLoadI = new IRNode();
-                        tempLoadI.setOpType(1, 0);
-                        tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(1)], 0);
-                        tempLoadI.setOperands(numRegisters - 1, 10);
-                        tempLoadI.setOperands(currentNode.getIndex(), 11);
-
-                        IRNode tempLoad = new IRNode();
-                        tempLoad.setOpType(0, 0);
-                        tempLoad.setOperands(numRegisters - 1, 2);
-                        tempLoad.setOperands(currentNode.getVR(1), 9);
-
-                        tempLoad.setOperands(currPR, 10);
-                        tempLoad.setOperands(currentNode.getIndex(), 11);
-
-                        currentNode.getPrev().setNext(tempLoadI);
-                        tempLoadI.setPrev(currentNode.getPrev());
-                        tempLoadI.setNext(tempLoad);
-                        tempLoad.setPrev(tempLoadI);
-                        tempLoad.setNext(currentNode);
-                        currentNode.setPrev(tempLoad);
-                    }
-
-                    // use
-                    if (VRToPR[currentNode.getVR(2)] != -1) {
-                        currentNode.setOperands(VRToPR[currentNode.getVR(2)], 6);
-                        currLastPRNU = VRToPR[currentNode.getVR(2)];
-                    } else {
-                        if (!PRStack.empty()) {
-                            currPR = PRStack.pop();
-                            currLastPRNU = currPR;
-                        } else {
-                            currLastPRNU = pickLastNU(PRNU, currLastPRNU);
-                            VRToSpillLocation[PRToVR[currLastPRNU]] = currSpillLoc;
-                            VRToPR[PRToVR[currLastPRNU]] = -1;
-
-                            IRNode tempLoadI = new IRNode();
-                            tempLoadI.setOpType(1, 0);
-                            tempLoadI.setOperands(currSpillLoc, 0);
-                            tempLoadI.setOperands(numRegisters - 1, 10);
-                            tempLoadI.setOperands(currentNode.getIndex(), 11);
-
-
-                            IRNode tempStore = new IRNode();
-                            tempStore.setOpType(0, 1);
-                            tempStore.setOperands(PRToVR[currLastPRNU], 1);
-                            tempStore.setOperands(currLastPRNU, 2);
-                            tempStore.setOperands(numRegisters - 1, 10);
-
-                            currentNode.getPrev().setNext(tempLoadI);
-                            tempLoadI.setPrev(currentNode.getPrev());
-                            tempLoadI.setNext(tempStore);
-                            tempStore.setPrev(tempLoadI);
-                            tempStore.setNext(currentNode);
-                            currentNode.setPrev(tempStore);
-                            currSpillLoc += 4;
-                            currPR = currLastPRNU;
-
-                        }
-
-                        PRToVR[currPR] = currentNode.getVR(2);
-                        VRToPR[currentNode.getVR(2)] = currPR;
-                        PRNU[currPR] = currentNode.getNU(2);
-                        currentNode.setOperands(currPR, 6);
-
-                        IRNode tempLoadI = new IRNode();
-                        tempLoadI.setOpType(1, 0);
-                        tempLoadI.setOperands(VRToSpillLocation[currentNode.getVR(2)], 0);
-                        tempLoadI.setOperands(numRegisters - 1, 10);
-                        tempLoadI.setOperands(currentNode.getIndex(), 11);
-
-                        IRNode tempLoad = new IRNode();
-                        tempLoad.setOpType(0, 0);
-                        tempLoad.setOperands(numRegisters - 1, 2);
-                        tempLoad.setOperands(currentNode.getVR(2), 9);
-
-                        tempLoad.setOperands(currPR, 10);
-                        tempLoad.setOperands(currentNode.getIndex(), 11);
-
-                        currentNode.getPrev().setNext(tempLoadI);
-                        tempLoadI.setPrev(currentNode.getPrev());
-                        tempLoadI.setNext(tempLoad);
-                        tempLoad.setPrev(tempLoadI);
-                        tempLoad.setNext(currentNode);
-                        currentNode.setPrev(tempLoad);
                     }
 
                     if (currentNode.getNU(1) == -1 && !(PRToVR[currentNode.getPR(1)] == -1)) {
